@@ -2,7 +2,11 @@ module github.com/asbeeq/grpc
 
 go 1.16
 
-// protoc --go_out=./pkg/api --go-grpc_opt=require_unimplemented_servers=false --go-grpc_out=./pkg/api api/proto/adder.proto
+// protoc --go_out=./user user.proto
+
+// to make protoc work:
+// export GO_PATH=~/go
+// export PATH=$PATH:/$GO_PATH/bin
 
 require (
 	google.golang.org/grpc v1.41.0
