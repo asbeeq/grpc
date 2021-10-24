@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"io"
 	"time"
 
 	pb "github.com/asbeeq/grpc/pb/numbers"
@@ -23,29 +22,25 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	stream, err := c.Rnd(ctx, &pb.NumRequest{N: 5, From: 0, To: 100})
+	stream, err := c.Sum(ctx)
 	if err != nil {
 		panic(err)
 	}
 
-	done := make(chan bool)
-	go func() {
-		for {
-			resp, err := stream.Recv()
-			if err == io.EOF {
-				done <- true
-				return
-			}
+	from, to := 1, 100
 
-			if err != nil {
-				panic(err)
-			}
-
-			fmt.Println("Received:", resp.String())
+	for i := from; i <= to; i++ {
+		err = stream.Send(&pb.NumRequest{X: int64(i)})
+		if err != nil {
+			panic(err)
 		}
-	}()
+	}
 
-	<-done
+	fmt.Println("Waiting for response…")
+	result, err := stream.CloseAndRecv()
 
-	fmt.Println("Client done")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("The sum from %d to %d is %d\n", from, to, result.Total)
 }

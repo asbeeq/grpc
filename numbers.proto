@@ -5,16 +5,13 @@ package numbers;
 option go_package="./numbers";
 
 message NumRequest {
-    int64 from = 1;
-    int64 to = 2;
-    int64 n = 3;
+    int64 x = 1;
 }
 
 message NumResponse {
-    int64 i = 1;
-    int64 remaining = 2;
+    int64 total = 1;
 }
 
 service NumService {
-    rpc Rnd (NumRequest) returns (stream NumResponse);
+    rpc Sum (stream NumRequest) returns (NumResponse);
 }

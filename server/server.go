@@ -1,9 +1,7 @@
 package main
 
 import (
-	"errors"
-	"math/rand"
-	"time"
+	"io"
 
 	pb "github.com/asbeeq/grpc/pb/numbers"
 
@@ -17,28 +15,23 @@ type NumServer struct {
 	pb.UnsafeNumServiceServer
 }
 
-func (u *NumServer) Rnd(req *pb.NumRequest, stream pb.NumService_RndServer) error {
-	fmt.Println("Server received:", req.String())
-	if req.N <= 0 {
-		return errors.New("N must be greater than zero")
-	}
-
-	if req.To <= req.From {
-		return errors.New("to must be greater or equal than from")
-	}
-
-	done := make(chan bool)
-
-	go func() {
-		for counter := 0; counter < int(req.N); counter++ {
-			i := rand.Intn(int(req.To)-int(req.From)+1) + int(req.To)
-			resp := pb.NumResponse{I: int64(i), Remaining: req.N - int64(counter)}
-			stream.Send(&resp)
-			time.Sleep(time.Second)
+func (n *NumServer) Sum(stream pb.NumService_SumServer) error {
+	var total int64 = 0
+	var counter int = 0
+	for {
+		next, err := stream.Recv()
+		if err == io.EOF {
+			fmt.Printf("Received %d numbers sum: %d\n", counter, total)
+			stream.SendAndClose(&pb.NumResponse{Total: total})
+			return nil
 		}
-		done <- true
-	}()
-	<-done
+		if err != nil {
+			return err
+		}
+
+		total = total + next.X
+		counter++
+	}
 
 	return nil
 }
