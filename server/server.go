@@ -1,22 +1,46 @@
 package main
 
 import (
-	pb "github.com/asbeeq/grpc/user"
+	"errors"
+	"math/rand"
+	"time"
 
-	"context"
+	pb "github.com/asbeeq/grpc/pb/numbers"
+
 	"fmt"
 	"net"
 
 	"google.golang.org/grpc"
 )
 
-type UserServer struct {
-	pb.UnimplementedUserServiceServer
+type NumServer struct {
+	pb.UnsafeNumServiceServer
 }
 
-func (u *UserServer) GetUser(ctx context.Context, req *pb.UserRequest) (*pb.User, error) {
+func (u *NumServer) Rnd(req *pb.NumRequest, stream pb.NumService_RndServer) error {
 	fmt.Println("Server received:", req.String())
-	return &pb.User{UserId: "John", Email: "john@gmail.com"}, nil
+	if req.N <= 0 {
+		return errors.New("N must be greater than zero")
+	}
+
+	if req.To <= req.From {
+		return errors.New("to must be greater or equal than from")
+	}
+
+	done := make(chan bool)
+
+	go func() {
+		for counter := 0; counter < int(req.N); counter++ {
+			i := rand.Intn(int(req.To)-int(req.From)+1) + int(req.To)
+			resp := pb.NumResponse{I: int64(i), Remaining: req.N - int64(counter)}
+			stream.Send(&resp)
+			time.Sleep(time.Second)
+		}
+		done <- true
+	}()
+	<-done
+
+	return nil
 }
 
 func main() {
@@ -27,7 +51,7 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	pb.RegisterUserServiceServer(s, &UserServer{})
+	pb.RegisterNumServiceServer(s, &NumServer{})
 
 	if err := s.Serve(lis); err != nil {
 		panic(err)
