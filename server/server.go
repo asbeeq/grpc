@@ -1,38 +1,46 @@
 package main
 
 import (
-	"io"
-
-	pb "github.com/asbeeq/grpc/pb/numbers"
-
 	"fmt"
+	"io"
+	"time"
+
+	pb "github.com/asbeeq/grpc/pb/chat"
+
 	"net"
 
 	"google.golang.org/grpc"
 )
 
-type NumServer struct {
-	pb.UnsafeNumServiceServer
+type ChatServer struct {
+	pb.UnsafeChatServiceServer
 }
 
-func (n *NumServer) Sum(stream pb.NumService_SumServer) error {
+func (c *ChatServer) SendTxt(stream pb.ChatService_SendTxtServer) error {
 	var total int64 = 0
-	var counter int = 0
+	go func() {
+		for {
+			t := time.NewTicker(time.Second * 2)
+			select {
+			case <-t.C:
+				stream.Send(&pb.StatsResponse{TotalChar: total})
+			}
+		}
+	}()
+
 	for {
 		next, err := stream.Recv()
 		if err == io.EOF {
-			fmt.Printf("Received %d numbers sum: %d\n", counter, total)
-			stream.SendAndClose(&pb.NumResponse{Total: total})
+			fmt.Println("Client closed")
 			return nil
 		}
 		if err != nil {
 			return err
 		}
 
-		total = total + next.X
-		counter++
+		fmt.Println("->", next.Txt)
+		total = total + int64(len(next.Txt))
 	}
-
 	return nil
 }
 
@@ -44,7 +52,7 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	pb.RegisterNumServiceServer(s, &NumServer{})
+	pb.RegisterChatServiceServer(s, &ChatServer{})
 
 	if err := s.Serve(lis); err != nil {
 		panic(err)

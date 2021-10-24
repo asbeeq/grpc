@@ -4,7 +4,7 @@
 // 	protoc        v3.12.4
 // source: numbers.proto
 
-package numbers
+package chat
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -20,16 +20,18 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type NumRequest struct {
+type ChatRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	X int64 `protobuf:"varint,1,opt,name=x,proto3" json:"x,omitempty"`
+	Id  int64  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	To  int64  `protobuf:"varint,2,opt,name=to,proto3" json:"to,omitempty"`
+	Txt string `protobuf:"bytes,3,opt,name=txt,proto3" json:"txt,omitempty"`
 }
 
-func (x *NumRequest) Reset() {
-	*x = NumRequest{}
+func (x *ChatRequest) Reset() {
+	*x = ChatRequest{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_numbers_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -37,13 +39,13 @@ func (x *NumRequest) Reset() {
 	}
 }
 
-func (x *NumRequest) String() string {
+func (x *ChatRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*NumRequest) ProtoMessage() {}
+func (*ChatRequest) ProtoMessage() {}
 
-func (x *NumRequest) ProtoReflect() protoreflect.Message {
+func (x *ChatRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_numbers_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -55,28 +57,42 @@ func (x *NumRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use NumRequest.ProtoReflect.Descriptor instead.
-func (*NumRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use ChatRequest.ProtoReflect.Descriptor instead.
+func (*ChatRequest) Descriptor() ([]byte, []int) {
 	return file_numbers_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *NumRequest) GetX() int64 {
+func (x *ChatRequest) GetId() int64 {
 	if x != nil {
-		return x.X
+		return x.Id
 	}
 	return 0
 }
 
-type NumResponse struct {
+func (x *ChatRequest) GetTo() int64 {
+	if x != nil {
+		return x.To
+	}
+	return 0
+}
+
+func (x *ChatRequest) GetTxt() string {
+	if x != nil {
+		return x.Txt
+	}
+	return ""
+}
+
+type StatsResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Total int64 `protobuf:"varint,1,opt,name=total,proto3" json:"total,omitempty"`
+	TotalChar int64 `protobuf:"varint,1,opt,name=total_char,json=totalChar,proto3" json:"total_char,omitempty"`
 }
 
-func (x *NumResponse) Reset() {
-	*x = NumResponse{}
+func (x *StatsResponse) Reset() {
+	*x = StatsResponse{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_numbers_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -84,13 +100,13 @@ func (x *NumResponse) Reset() {
 	}
 }
 
-func (x *NumResponse) String() string {
+func (x *StatsResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*NumResponse) ProtoMessage() {}
+func (*StatsResponse) ProtoMessage() {}
 
-func (x *NumResponse) ProtoReflect() protoreflect.Message {
+func (x *StatsResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_numbers_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -102,14 +118,14 @@ func (x *NumResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use NumResponse.ProtoReflect.Descriptor instead.
-func (*NumResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use StatsResponse.ProtoReflect.Descriptor instead.
+func (*StatsResponse) Descriptor() ([]byte, []int) {
 	return file_numbers_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *NumResponse) GetTotal() int64 {
+func (x *StatsResponse) GetTotalChar() int64 {
 	if x != nil {
-		return x.Total
+		return x.TotalChar
 	}
 	return 0
 }
@@ -118,16 +134,20 @@ var File_numbers_proto protoreflect.FileDescriptor
 
 var file_numbers_proto_rawDesc = []byte{
 	0x0a, 0x0d, 0x6e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12,
-	0x07, 0x6e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x73, 0x22, 0x1a, 0x0a, 0x0a, 0x4e, 0x75, 0x6d, 0x52,
-	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0c, 0x0a, 0x01, 0x78, 0x18, 0x01, 0x20, 0x01, 0x28,
-	0x03, 0x52, 0x01, 0x78, 0x22, 0x23, 0x0a, 0x0b, 0x4e, 0x75, 0x6d, 0x52, 0x65, 0x73, 0x70, 0x6f,
-	0x6e, 0x73, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x74, 0x6f, 0x74, 0x61, 0x6c, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x03, 0x52, 0x05, 0x74, 0x6f, 0x74, 0x61, 0x6c, 0x32, 0x40, 0x0a, 0x0a, 0x4e, 0x75, 0x6d,
-	0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x32, 0x0a, 0x03, 0x53, 0x75, 0x6d, 0x12, 0x13,
-	0x2e, 0x6e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x73, 0x2e, 0x4e, 0x75, 0x6d, 0x52, 0x65, 0x71, 0x75,
-	0x65, 0x73, 0x74, 0x1a, 0x14, 0x2e, 0x6e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x73, 0x2e, 0x4e, 0x75,
-	0x6d, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x28, 0x01, 0x42, 0x0b, 0x5a, 0x09, 0x2e,
-	0x2f, 0x6e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x07, 0x6e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x73, 0x22, 0x3f, 0x0a, 0x0b, 0x43, 0x68, 0x61, 0x74,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x03, 0x52, 0x02, 0x69, 0x64, 0x12, 0x0e, 0x0a, 0x02, 0x74, 0x6f, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x03, 0x52, 0x02, 0x74, 0x6f, 0x12, 0x10, 0x0a, 0x03, 0x74, 0x78, 0x74, 0x18, 0x03,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x74, 0x78, 0x74, 0x22, 0x2e, 0x0a, 0x0d, 0x53, 0x74, 0x61,
+	0x74, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x1d, 0x0a, 0x0a, 0x74, 0x6f,
+	0x74, 0x61, 0x6c, 0x5f, 0x63, 0x68, 0x61, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x09,
+	0x74, 0x6f, 0x74, 0x61, 0x6c, 0x43, 0x68, 0x61, 0x72, 0x32, 0x4a, 0x0a, 0x0b, 0x43, 0x68, 0x61,
+	0x74, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x3b, 0x0a, 0x07, 0x53, 0x65, 0x6e, 0x64,
+	0x54, 0x78, 0x74, 0x12, 0x14, 0x2e, 0x6e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x73, 0x2e, 0x43, 0x68,
+	0x61, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e, 0x6e, 0x75, 0x6d, 0x62,
+	0x65, 0x72, 0x73, 0x2e, 0x53, 0x74, 0x61, 0x74, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x28, 0x01, 0x30, 0x01, 0x42, 0x08, 0x5a, 0x06, 0x2e, 0x2f, 0x63, 0x68, 0x61, 0x74, 0x62,
+	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -144,12 +164,12 @@ func file_numbers_proto_rawDescGZIP() []byte {
 
 var file_numbers_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_numbers_proto_goTypes = []interface{}{
-	(*NumRequest)(nil),  // 0: numbers.NumRequest
-	(*NumResponse)(nil), // 1: numbers.NumResponse
+	(*ChatRequest)(nil),   // 0: numbers.ChatRequest
+	(*StatsResponse)(nil), // 1: numbers.StatsResponse
 }
 var file_numbers_proto_depIdxs = []int32{
-	0, // 0: numbers.NumService.Sum:input_type -> numbers.NumRequest
-	1, // 1: numbers.NumService.Sum:output_type -> numbers.NumResponse
+	0, // 0: numbers.ChatService.SendTxt:input_type -> numbers.ChatRequest
+	1, // 1: numbers.ChatService.SendTxt:output_type -> numbers.StatsResponse
 	1, // [1:2] is the sub-list for method output_type
 	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -164,7 +184,7 @@ func file_numbers_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_numbers_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*NumRequest); i {
+			switch v := v.(*ChatRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -176,7 +196,7 @@ func file_numbers_proto_init() {
 			}
 		}
 		file_numbers_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*NumResponse); i {
+			switch v := v.(*StatsResponse); i {
 			case 0:
 				return &v.state
 			case 1:

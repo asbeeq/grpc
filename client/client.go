@@ -5,9 +5,40 @@ import (
 	"fmt"
 	"time"
 
-	pb "github.com/asbeeq/grpc/pb/numbers"
+	pb "github.com/asbeeq/grpc/pb/chat"
 	"google.golang.org/grpc"
 )
+
+func Chat(stream pb.ChatService_SendTxtClient, done chan bool) {
+	t := time.NewTicker(time.Millisecond * 500)
+	for {
+		select {
+		case <-done:
+			return
+		case <-t.C:
+			err := stream.Send(&pb.ChatRequest{Txt: "Hello", Id: 1, To: 2})
+			if err != nil {
+				panic(err)
+			}
+		}
+	}
+}
+
+func Stats(stream pb.ChatService_SendTxtClient, done chan bool) {
+	for {
+		stats, err := stream.Recv()
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(stats.String())
+
+		if stats.TotalChar > 35 {
+			done <- true
+			stream.CloseSend()
+			return
+		}
+	}
+}
 
 func main() {
 	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure(), grpc.WithBlock())
@@ -17,30 +48,17 @@ func main() {
 
 	defer conn.Close()
 
-	c := pb.NewNumServiceClient(conn)
+	c := pb.NewChatServiceClient(conn)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
-	defer cancel()
-
-	stream, err := c.Sum(ctx)
+	stream, err := c.SendTxt(context.Background())
 	if err != nil {
 		panic(err)
 	}
 
-	from, to := 1, 100
+	done := make(chan bool)
 
-	for i := from; i <= to; i++ {
-		err = stream.Send(&pb.NumRequest{X: int64(i)})
-		if err != nil {
-			panic(err)
-		}
-	}
+	go Stats(stream, done)
+	go Chat(stream, done)
 
-	fmt.Println("Waiting for response…")
-	result, err := stream.CloseAndRecv()
-
-	if err != nil {
-		panic(err)
-	}
-	fmt.Printf("The sum from %d to %d is %d\n", from, to, result.Total)
+	<-done
 }

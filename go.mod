@@ -2,7 +2,7 @@ module github.com/asbeeq/grpc
 
 go 1.16
 
-// client streaming example
+// bidirectional streaming example
 
 // subdir "/numbers" created automatically, but "/pb" - manually
 // problem with package underscore (package _) solved, after generation package name in pb files - "package numbers"
