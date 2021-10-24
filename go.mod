@@ -2,7 +2,7 @@ module github.com/asbeeq/grpc
 
 go 1.16
 
-// protoc --go_out=./user user.proto
+// protoc -I=. --go_out=./user --go-grpc_out=./user *.proto
 
 // to make protoc work:
 // export GO_PATH=~/go
