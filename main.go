@@ -9,18 +9,25 @@ import (
 )
 
 func main() {
-	u := user.User{Name: "asdfg", UserId: "1"}
-	fmt.Println("To encode:", u.String())
-	encoded, err := proto.Marshal(&u)
-	if err != nil {
+	userA := user.User{UserId: "John", Email: "john@gmail.com"}
+	userB := user.User{UserId: "Mary", Email: "mary@gmail.com"}
 
+	g := user.Group{
+		Id:       1,
+		Score:    42.0,
+		Category: user.Category_OPERATOR,
+		Users:    []*user.User{&userA, &userB},
+	}
+
+	fmt.Println("To encode:", g.String())
+
+	encoded, err := proto.Marshal(&g)
+	if err != nil {
 		panic(err)
 	}
 
-	v := user.User{}
-	err = proto.Unmarshal(encoded, &v)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("Recovered:", v.String())
+	recovered := user.Group{}
+
+	err = proto.Unmarshal(encoded, &recovered)
+	fmt.Println("Recovered:", recovered.String())
 }
